@@ -19,27 +19,28 @@
     .formulario {
       background-color: #ffffff;
       color: #000000;
-      padding: 30px;
+      padding: 20px;
       border-radius: 12px;
-      width: 90%;
-      max-width: 500px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      width: 92%;
+      max-width: 450px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.2);
     }
 
     .formulario h2 {
       background-color: #008D41;
       color: #ffffff;
-      padding: 15px;
+      padding: 10px;
+      font-size: 18px;
       text-align: center;
-      border-radius: 8px;
-      margin-top: 0;
-      margin-bottom: 20px;
+      border-radius: 6px;
+      margin: 0 0 12px 0;
     }
 
     label {
       font-weight: bold;
       display: block;
-      margin-bottom: 5px;
+      margin-bottom: 3px;
+      font-size: 14px;
     }
 
     .required::after {
@@ -50,11 +51,11 @@
     input, select {
       width: 100%;
       box-sizing: border-box;
-      padding: 14px;
-      margin-bottom: 20px;
+      padding: 10px;
+      margin-bottom: 12px;
       border: 2px solid #B3B3B3;
-      border-radius: 6px;
-      font-size: 16px;
+      border-radius: 5px;
+      font-size: 14px;
       background-color: #E0E0E0;
       transition: background-color 0.3s, border-color 0.3s;
     }
@@ -73,10 +74,10 @@
     button {
       background-color: #A6CC13;
       color: #000000;
-      font-size: 16px;
+      font-size: 14px;
       border: none;
-      border-radius: 8px;
-      padding: 14px;
+      border-radius: 6px;
+      padding: 10px;
       width: 100%;
       cursor: pointer;
       transition: background-color 0.3s ease;
@@ -87,9 +88,10 @@
     }
 
     #estado {
-      margin-top: 10px;
+      margin-top: 6px;
       color: #666666;
       text-align: center;
+      font-size: 13px;
       font-weight: bold;
     }
   </style>
@@ -132,13 +134,12 @@
   </div>
 
   <script>
-    let lat = '';
-    let lon = '';
+    let lat = '', lon = '';
 
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        lat = position.coords.latitude;
-        lon = position.coords.longitude;
+      (pos) => {
+        lat = pos.coords.latitude;
+        lon = pos.coords.longitude;
       },
       () => {
         document.getElementById("estado").innerText = "Ubicación no autorizada.";
@@ -170,7 +171,6 @@
       if (clave === "reporte" && !/^[a-zA-Z0-9\-]+$/.test(valor)) {
         campo.classList.add("invalid");
       }
-
       if (clave === "placas" && !/^[a-zA-Z0-9]+$/.test(valor)) {
         campo.classList.add("invalid");
       }
@@ -189,13 +189,11 @@
           campo.classList.add("invalid");
           error = true;
         }
-
         if (clave === "reporte" && valor && !/^[a-zA-Z0-9\-]+$/.test(valor)) {
           campo.classList.add("invalid");
           document.getElementById("estado").innerText = "El número de reporte solo debe contener letras, números y guiones.";
           error = true;
         }
-
         if (clave === "placas" && valor && !/^[a-zA-Z0-9]+$/.test(valor)) {
           campo.classList.add("invalid");
           document.getElementById("estado").innerText = "Las placas solo deben contener letras y números.";
