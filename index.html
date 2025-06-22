@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro ingreso de unidad</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      background-color: #008D41;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      color: #ffffff;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .formulario {
+      background-color: #ffffff;
+      color: #000000;
+      padding: 30px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    }
+
+    .formulario h2 {
+      background-color: #008D41;
+      color: #ffffff;
+      padding: 15px;
+      text-align: center;
+      border-radius: 8px;
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .required::after {
+      content: " *";
+      color: red;
+    }
+
+    input, select {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 14px;
+      margin-bottom: 20px;
+      border: 2px solid #B3B3B3;
+      border-radius: 6px;
+      font-size: 16px;
+      background-color: #E0E0E0;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+
+    input:focus,
+    select:focus {
+      background-color: #999999;
+      outline: none;
+    }
+
+    input.invalid,
+    select.invalid {
+      border-color: red;
+    }
+
+    button {
+      background-color: #A6CC13;
+      color: #000000;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      padding: 14px;
+      width: 100%;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #91b10f;
+    }
+
+    #estado {
+      margin-top: 10px;
+      color: #666666;
+      text-align: center;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="formulario">
+    <h2>Registro ingreso de unidad</h2>
+
+    <label class="required">Número de Reporte:</label>
+    <input type="text" id="reporte" placeholder="Ej. 1234-AZ-01" required>
+
+    <label class="required">Nombre:</label>
+    <input type="text" id="nombre" required>
+
+    <label class="required">Placas:</label>
+    <input type="text" id="placas" placeholder="ABC1234" required>
+
+    <label class="required">Cliente:</label>
+    <select id="tipo" required>
+      <option value="">-- Selecciona --</option>
+      <option value="Asegurado">Asegurado</option>
+      <option value="Tercero">Tercero</option>
+    </select>
+
+    <label class="required">Teléfono:</label>
+    <input type="tel" id="telefono" required>
+
+    <label class="required">Correo electrónico:</label>
+    <input type="email" id="correo" placeholder="ejemplo@correo.com" required>
+
+    <label class="required">Ingreso para:</label>
+    <select id="ingreso" required>
+      <option value="">-- Selecciona --</option>
+      <option value="Valuación de unidad">Valuación de unidad</option>
+      <option value="Reparación de unidad">Reparación de unidad</option>
+    </select>
+
+    <button onclick="crearCorreo()">Crear correo</button>
+    <p id="estado"></p>
+  </div>
+
+  <script>
+    let lat = '';
+    let lon = '';
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        lat = position.coords.latitude;
+        lon = position.coords.longitude;
+      },
+      () => {
+        document.getElementById("estado").innerText = "Ubicación no autorizada.";
+      }
+    );
+
+    const campos = {
+      reporte: document.getElementById("reporte"),
+      nombre: document.getElementById("nombre"),
+      placas: document.getElementById("placas"),
+      tipo: document.getElementById("tipo"),
+      telefono: document.getElementById("telefono"),
+      correo: document.getElementById("correo"),
+      ingreso: document.getElementById("ingreso")
+    };
+
+    for (let clave in campos) {
+      campos[clave].addEventListener("input", function () {
+        validarCampo(clave);
+      });
+    }
+
+    function validarCampo(clave) {
+      const campo = campos[clave];
+      const valor = campo.value.trim();
+      campo.classList.remove("invalid");
+      if (!valor) return;
+
+      if (clave === "reporte" && !/^[a-zA-Z0-9\-]+$/.test(valor)) {
+        campo.classList.add("invalid");
+      }
+
+      if (clave === "placas" && !/^[a-zA-Z0-9]+$/.test(valor)) {
+        campo.classList.add("invalid");
+      }
+    }
+
+    function crearCorreo() {
+      let error = false;
+      document.getElementById("estado").innerText = "";
+
+      for (let clave in campos) {
+        const campo = campos[clave];
+        const valor = campo.value.trim();
+        campo.classList.remove("invalid");
+
+        if (!valor) {
+          campo.classList.add("invalid");
+          error = true;
+        }
+
+        if (clave === "reporte" && valor && !/^[a-zA-Z0-9\-]+$/.test(valor)) {
+          campo.classList.add("invalid");
+          document.getElementById("estado").innerText = "El número de reporte solo debe contener letras, números y guiones.";
+          error = true;
+        }
+
+        if (clave === "placas" && valor && !/^[a-zA-Z0-9]+$/.test(valor)) {
+          campo.classList.add("invalid");
+          document.getElementById("estado").innerText = "Las placas solo deben contener letras y números.";
+          error = true;
+        }
+      }
+
+      if (error) {
+        if (!document.getElementById("estado").innerText)
+          document.getElementById("estado").innerText = "Por favor, completa todos los campos correctamente.";
+        return;
+      }
+
+      const fecha = new Date().toLocaleString();
+      const asunto = encodeURIComponent("Ingreso de unidad QRC");
+
+      const cuerpo = encodeURIComponent(
+        `Número de Reporte: <${campos.reporte.value}>\n` +
+        `Nombre: <${campos.nombre.value}>\n` +
+        `Placas: <${campos.placas.value}>\n` +
+        `Cliente: <${campos.tipo.value}>\n` +
+        `Teléfono: <${campos.telefono.value}>\n` +
+        `Correo del remitente: <${campos.correo.value}>\n` +
+        `Ingreso para: <${campos.ingreso.value}>\n` +
+        `Latitud: <${lat}>\n` +
+        `Longitud: <${lon}>\n` +
+        `Fecha: <${fecha}>`
+      );
+
+      const destinatarios = "ramon.rocha@afirme.com,r_3.1416@hotmail.com";
+      const mailtoLink = `mailto:${destinatarios}?subject=${asunto}&body=${cuerpo}`;
+
+      window.location.href = mailtoLink;
+    }
+  </script>
+</body>
+</html>
